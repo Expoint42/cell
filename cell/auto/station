@@ -1,0 +1,27 @@
+#!/bin/sh /etc/rc.common
+# Copyright (C) 2017-2020 LessVars.com
+#
+# NOTE: Must place under /etc/init.d/ directory
+# DESCRIPTION: list on the iw event -t -f and call /root/tasks/station.lua
+# when event happens.
+#
+# AUTHOR: hexcola@gmail.com
+# REQUIREMENTS: iw
+
+START=10
+
+log_file="/tmp/log/station.log"
+lua_script="/root/cell/scripts/station.lua"
+
+start() {
+    # restart wifi services /sbin/wifi
+    wifi
+    
+    echo -e "\n`date -u`.started" | tee -a "$log_file"
+    lua $lua_script && echo -e "ok" | tee -a "$log_file"
+}
+
+stop(){
+    # https://stackoverflow.com/questions/3510673/find-and-kill-a-process-in-one-line-using-bash-and-regex
+    kill $(ps | grep 'iw event\|station.lua' | awk '{print $1}')
+}
